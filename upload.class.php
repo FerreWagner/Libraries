@@ -22,13 +22,13 @@
      * @param array   $allowMime  [description]
      */
     public function __construct($filename='myfile',$uploadPath='./upload',$imgFlag=true,$maxSize=3145728,$allowExt=array('jpeg','jpg','png','gif'),$allowMime=array('image/jpeg','image/png','image/gif')){
-      $this->filename     = $filename;
-      $this->maxSize      = $maxSize;
-      $this->allowMime    = $allowMime;
-      $this->allowExt     = $allowExt;
-      $this->uploadPath   = $uploadPath;
-      $this->imgFlag      = $imgFlag;
-      $this->fileInfo     = array();
+      $this->filename     = $filename;      //表单form里上传文件的name,默认为myfile[]
+      $this->maxSize      = $maxSize;       //允许上传大最大值
+      $this->allowMime    = $allowMime;     //允许上传的类型
+      $this->allowExt     = $allowExt;      //允许上传的后缀名
+      $this->uploadPath   = $uploadPath;    //上传文件保存的路径
+      $this->imgFlag      = $imgFlag;       //是否设置验证文件真实类型的FLAG
+      $this->fileInfo     = array();        //将fileinfo设置为数组，以便保存多个数据
       // $this->fileInfo  = $_FILES[$this->filename];
       
       $this->arraydata();
