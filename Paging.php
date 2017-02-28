@@ -45,12 +45,12 @@ body{
             }
             
             $_mysqli->set_charset("set names utf8");
+	    //设置页面page情况
             if ($this->_page < 1){
                 $this->_page = 1;
             }elseif (is_int($this->_page)){
                 $this->_page = 1;
             }
-            
             
             //将需要搜索的数据进行处理，分隔成字符串
             if(isset($this->_field)){
@@ -59,24 +59,24 @@ body{
                 //如果未设置搜索数据,那么默认为搜索所有数据
                 $this->_field = '*';
             }
-            $_sql = "select ".$this->_field." from ".$this->_table." limit ".($this->_page - 1)*$this->_pagesize . ",$this->_pagesize ";
+            $_sql    = "select ".$this->_field." from ".$this->_table." limit ".($this->_page - 1)*$this->_pagesize . ",$this->_pagesize ";
             $_result = $_mysqli->query($_sql);
             
             echo "<table border=1 cellspacing=0 width=10% align=center>";
             echo "<tr><th>NAME</th><th>DATA</th></tr>";
             while (!!$_rows = $_result->fetch_array()){
                 echo "<tr>";
-                echo "<td>{$_rows['name']}</td>";
-                echo "<td>{$_rows['password']}</td>";
+                echo "<td>{$_rows['title']}</td>";
+                echo "<td>{$_rows['desc']}</td>";
                 echo "</tr>";
             }
             echo "</table>";
             
             //获取总数据量
-            $_total_sql = 'select count(*) from '.$this->_table;
+            $_total_sql    = 'select count(*) from '.$this->_table;
             $_total_result = $_mysqli->query($_total_sql);
             while (!!$_total_rows = $_total_result->fetch_array()){
-            //提取分页的总数据量
+            	//提取分页的总数据量
                 $_data = $_total_rows[0];
             }
             
@@ -86,7 +86,7 @@ body{
             $_result->free();
             $_mysqli->close();
             
-            //显示数据 + 分页条;$_SERVER['PHP_SELE']：访问本页   
+            //显示数据 + 分页条;
             //$_page_banner为显示的页码数据
             
             //计算偏移量
@@ -94,37 +94,45 @@ body{
             
             if($this->_page > 1){
                 @$_page_banner .= "<a href='".$_SERVER['PHP_SELF']."?page=1'>首页</a>";
-                $_page_banner .= "<a href='".$_SERVER['PHP_SELF']."?page=".($this->_page-1)."'><上一页</a>";
-            }else{
+                $_page_banner  .= "<a href='".$_SERVER['PHP_SELF']."?page=".($this->_page-1)."'><上一页</a>";
+            }elseif($this->_page < 1){
                 @$_page_banner .= "<span class='disable'>首页</a></span>";
-                $_page_banner .= "<span class='disable'>上一页</a></span>";
+                $_page_banner  .= "<span class='disable'>上一页</a></span>";
+            }elseif($this->_page > $_total_pages){
+                @$_page_banner .= "<span class='disable'>首页</a></span>";
+                $_page_banner  .= "<span class='disable'>上一页</a></span>";
             }
             
             //初始化数据,数字页码
+	    //这里是初始化情况,也是$_total_pages<=$_show_page的情况
             $_start = 1;
-            $_end = $_total_pages;
+            $_end   = $_total_pages;
+	    //这里总页数>显示页面数量的情况
             if($_total_pages > $this->_show_page){
-                if($this->_page > $_page_offset+1){              //当前页码>偏移量+1，就 加上省略号，体验友好
+                if($this->_page > $_page_offset + 1){
                     $_page_banner .= "..";
                 }
-                if($this->_page > $_page_offset){                 //此处意为：若当前页>偏移量（即已经脱离了最开始的那几页，例正在第三页>偏移量2，那么对start和end做处理），以便于后面的显示
-                    $_start = $this->_page - $_page_offset;       //起始页为当前页-偏移量（这里为2）
-                    $_end = $_total_pages > $this->_page+$_page_offset ? $this->_page+$_page_offset : $_total_pages;
-                    //当总页数>当前页+偏移量，那么end赋给当前页+偏移量，否则end赋给总页数
-                    //目的是为了，如果当前页（如5）+偏移量（如2）=7小于总页数，那么就显示完整的页码+..，否则直接显示最后一页
+		//对脱离最开始偏移量的页数做处理
+                if($this->_page > $_page_offset){
+                    $_start = $this->_page - $_page_offset;
+                    $_end   = $_total_pages > $this->_page+$_page_offset ? $this->_page+$_page_offset : $_total_pages;
+                    //如果当前页（如5）+偏移量（如2）=7小于总页数，那么就显示完整的页码+..，否则直接显示最后一页
                 }else{
+		    //对未脱离偏移量的起始页码做处理
                     //当前页码小于或等于偏移量，我们设置的偏移量为2，这里可看做：页码为1或者2的时候，开始页面都为1，
                     $_start = 1;
-                    $_end = $_total_pages > $this->_show_page ? $this->_show_page : $_total_pages;
+                    $_end   = $_total_pages > $this->_show_page ? $this->_show_page : $_total_pages;
                     //如果总页码>设置的显示页码（即大于5），那么就显示最开始的5页，否则，显示所有页数（总页数）
                 }
-                if($this->_page + $_page_offset > $_total_pages){                     //当当前页+偏移量>总页码（即到了后面的页码数据量越来越接近最后，根本用不上偏移量）
-                    $_start = $_start - ($this->_page + $_page_offset - $_end);   //这里的start从$_page>$_page_offset来得到，由此算法得到后几页的页码规律
+		//对临近尾页的页码做处理
+                if($this->_page + $_page_offset > $_total_pages){
+                    $_start = $_start - ($this->_page + $_page_offset - $_end);
+		    //这里的start从$_page>$_page_offset来得到，这个算法重要的是$_page当前页码,可由规律得到
                 }
                 
             }
-            
-            for($_i = $_start;$_i <= $_end;$_i ++){     //循环显示出页码数
+            //循环显示出页码数
+            for($_i = $_start;$_i <= $_end;$_i ++){
                 if($this->_page == $_i){
                     $_page_banner .= "<span class='current'>{$_i}</span>";
                 }else{
@@ -140,7 +148,7 @@ body{
                 $_page_banner .= "<span class='disable'>尾页</a></span>";
                 $_page_banner .= "<span class='disable'>下一页</a></span>";
             }
-            
+            //banner末尾下一页和尾页的显示
             if($this->_page < $_total_pages){
                 $_page_banner .= "<a href='".$_SERVER['PHP_SELF']."?page=".($this->_page+1)."'>下一页></a>";
                 $_page_banner .= "<a href='".$_SERVER['PHP_SELF']."?page=".($_total_pages)."'>尾页</a>";
