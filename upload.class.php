@@ -1,7 +1,11 @@
 <?php 
 
-//Statement：此程序根据慕课网的http://www.imooc.com/learn/219作者King及Jirachi的优化代码;URL:https://github.com/PichurChill/PHP_CLASS/blob/master/multiple_upload_class/test.html
-  
+  /*TIPS：使用此上传图片类须知：
+  1、只有会持HTML5标准才允许多文件上传;
+  2、如果默认上传文件name值，则为myfile;
+  3、如果想多文件上传，那么HTML中的name值请务必设置为数组形式，如：name="myfile[]";
+  4、使用本类功能只需要调用uploadFile公共类即可；
+  */  
   class upload{
     private $filename;
     private $maxSize;
@@ -42,11 +46,11 @@
                 $i++;
             }elseif(is_array($file['name'])){
                 foreach ($file['name'] as $key => $value) {
-                    $this->fileInfo[$i]['name']=$file['name'][$key];
-                    $this->fileInfo[$i]['type']=$file['type'][$key];
-                    $this->fileInfo[$i]['tmp_name']=$file['tmp_name'][$key];
-                    $this->fileInfo[$i]['error']=$file['error'][$key];
-                    $this->fileInfo[$i]['size']=$file['size'][$key];
+                    $this->fileInfo[$i]['name']     = $file['name'][$key];
+                    $this->fileInfo[$i]['type']     = $file['type'][$key];
+                    $this->fileInfo[$i]['tmp_name'] = $file['tmp_name'][$key];
+                    $this->fileInfo[$i]['error']    = $file['error'][$key];
+                    $this->fileInfo[$i]['size']     = $file['size'][$key];
                     $i++;
                 }
             }
