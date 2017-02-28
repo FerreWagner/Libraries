@@ -1,9 +1,16 @@
-声明(Statement)：此程序借鉴于慕课网讲师 BobWang(PHP开发工程师)编写,请勿抄袭，谢谢；URL：http://www.imooc.com/learn/419
-
-Author:将BobWang的程序进行简单封装；
+<style type="text/css">
+*{
+	text-align:center;
+	font-family:微软雅黑;
+	font-size:13px;
+}
+body{
+	margin:40px 0 20px 0;
+}
+</style>
 
 <?php
-
+    //TIPS:位于代码69、70行的数据需要替换成您需要查询的数据库字段;另外，实例化此程序请先准备好$_field数组数据,为空则默认搜索所有数据;
     class Paging{
         
         private $_page;                 //当前页码
@@ -14,27 +21,23 @@ Author:将BobWang的程序进行简单封装；
         private $_password;             //数据库密码
         private $_db_name;              //数据库名称
         private $_table;                //数据表表名
+        private $_field = array();      //需要搜索的数据
         
         
-        public function __construct($pagesize,$page,$localhost,$user,$password,$dbname,$table){
+        public function __construct($pagesize,$page,$localhost,$user,$password,$dbname,$table,$field){
             //对可变参数数据进行初始化
-            $this->_pagesize  = $pagesize;
+            $this->_pagesize  = @$pagesize;
             $this->_page      = @$_GET['page'];      //初始化当前页码
             $this->_localhost = $localhost;
             $this->_user      = $user;
             $this->_password  = $password;
             $this->_db_name   = $dbname;
             $this->_table     = $table;
+            $this->_field     = @$field;
             $this->PlayPage();
         }
         
         private function PlayPage(){
-            if ($this->_page < 1){
-                $this->_page = 1;
-            }elseif (is_int($this->_page)){
-                $this->_page = 1;
-            }
-            
             //根据页码取出数据;
             $_mysqli = new mysqli($this->_localhost,$this->_user,$this->_password,$this->_db_name);
             if(!$_mysqli){
@@ -42,15 +45,29 @@ Author:将BobWang的程序进行简单封装；
             }
             
             $_mysqli->set_charset("set names utf8");
-            $_sql = "select * from demo limit ".($this->_page - 1)*$this->_pagesize . ",$this->_pagesize ";
+            if ($this->_page < 1){
+                $this->_page = 1;
+            }elseif (is_int($this->_page)){
+                $this->_page = 1;
+            }
+            
+            
+            //将需要搜索的数据进行处理，分隔成字符串
+            if(isset($this->_field)){
+                $this->_field = implode(',', $this->_field);
+            }else{  
+                //如果未设置搜索数据,那么默认为搜索所有数据
+                $this->_field = '*';
+            }
+            $_sql = "select ".$this->_field." from ".$this->_table." limit ".($this->_page - 1)*$this->_pagesize . ",$this->_pagesize ";
             $_result = $_mysqli->query($_sql);
             
             echo "<table border=1 cellspacing=0 width=10% align=center>";
             echo "<tr><th>NAME</th><th>DATA</th></tr>";
             while (!!$_rows = $_result->fetch_array()){
                 echo "<tr>";
-                echo "<td>{$_rows['id']}</td>";
-                echo "<td>{$_rows['n_info']}</td>";
+                echo "<td>{$_rows['name']}</td>";
+                echo "<td>{$_rows['password']}</td>";
                 echo "</tr>";
             }
             echo "</table>";
@@ -59,7 +76,7 @@ Author:将BobWang的程序进行简单封装；
             $_total_sql = 'select count(*) from '.$this->_table;
             $_total_result = $_mysqli->query($_total_sql);
             while (!!$_total_rows = $_total_result->fetch_array()){
-//                 提取分页的总数据量
+            //提取分页的总数据量
                 $_data = $_total_rows[0];
             }
             
@@ -91,7 +108,7 @@ Author:将BobWang的程序进行简单封装；
                     $_page_banner .= "..";
                 }
                 if($this->_page > $_page_offset){                 //此处意为：若当前页>偏移量（即已经脱离了最开始的那几页，例正在第三页>偏移量2，那么对start和end做处理），以便于后面的显示
-                    $_start = $this->_page - $_page_offset;   //起始页为当前页-偏移量（这里为2）
+                    $_start = $this->_page - $_page_offset;       //起始页为当前页-偏移量（这里为2）
                     $_end = $_total_pages > $this->_page+$_page_offset ? $this->_page+$_page_offset : $_total_pages;
                     //当总页数>当前页+偏移量，那么end赋给当前页+偏移量，否则end赋给总页数
                     //目的是为了，如果当前页（如5）+偏移量（如2）=7小于总页数，那么就显示完整的页码+..，否则直接显示最后一页
