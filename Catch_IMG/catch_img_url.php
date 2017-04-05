@@ -7,9 +7,7 @@
 <head>
 <title>瀑布流布局</title>
 <meta charset="utf8" />
-<link type="text/css" rel="stylesheet" href="css/style.css">
-<script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.js"></script>
-<script src="js/script.js"></script>
+<link type="text/css" rel="stylesheet" href="style.css">
 </head>
 <body>
 
