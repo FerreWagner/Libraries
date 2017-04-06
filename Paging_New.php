@@ -40,9 +40,11 @@ class Page{
         $_arr_current  = parse_url($_current_url);  //将url拆分到数组里
         $_current_path = $_arr_current['path']; 
         $_url = '';
-        if(isset($_arr_current['query'])){          //判断是否存在参数部分
+        //判断是否存在参数部分
+        if(isset($_arr_current['query'])){          
             parse_str($_arr_current['query'],$_arr_query);
-            unset($_arr_query[$this->_page]);       //去掉page参数,为了将page参数放在末尾
+            //去掉page参数,为了将page参数放在末尾
+            unset($_arr_query[$this->_page]);      
             if(empty($_arr_query)){
                 $_url = "{$_current_path}?{$this->_page}=";
             }else{  //还存在其他参数,如：id=xxx
@@ -64,12 +66,16 @@ class Page{
             }
         }else{
             $_page_left      = floor(($this->_button - 1)/2);
-            $_start_page     = $_GET[$this->_page] - $_page_left;   //起始页码号
-            $_end_page       = $_start_page + $this->_button - 1;   //结束页码数
-            if($_start_page  < 1){   //当跳到首页，强制设置页码为1，避免出现为0的页码
+            //起始页码号
+            $_start_page     = $_GET[$this->_page] - $_page_left;   
+            //结束页码数
+            $_end_page       = $_start_page + $this->_button - 1;   
+            //当跳到首页，强制设置页码为1，避免出现为0的页码
+            if($_start_page  < 1){   
                 $_start_page = 1;
             }
-            if($_end_page    > $_pagecount){   //当下面的计算程序到结尾出现：尾部会多出几个多余的页数时会执行
+            //当下面的计算程序到结尾出现：尾部会多出几个多余的页数时会执行
+            if($_end_page    > $_pagecount){   
                 $_start_page = $_pagecount - ($this->_button - 1);
             }
             
@@ -83,18 +89,23 @@ class Page{
             }
             //判断存在几个按钮(即数组里有几个元素),少于2个按钮就不做省略号效果
             if(count($_html) >= 3){
-                reset($_html);              //将数组内部指向第一个单元
-                $_key_first = key($_html);  //取到第一个单元的下标
-                end($_html);                //将数组内部指向最后一个单元
+                //将数组内部指向第一个单元
+                reset($_html);              
+                //取到第一个单元的下标
+                $_key_first = key($_html);  
+                //将数组内部指向最后一个单元
+                end($_html);                
                 $_key_end   = key($_html);
                 //构造不为第一页时的省略号
                 if($_key_first != 1){
-                    array_shift($_html);    //去掉数组的第一个元素,然后下标从0开始
+                    //去掉数组的第一个元素,然后下标从0开始
+                    array_shift($_html);    
                     array_unshift($_html, "<a href='{$_url}1'>1...</a>");
                 }
                 //构造不为最后一页时的省略号
                 if($_key_end != $_pagecount){
-                    array_pop($_html);      //将最后一个元素弹出(出栈)
+                    //将最后一个元素弹出(出栈)
+                    array_pop($_html);      
                     array_push($_html, "<a href='{$_url}{$_pagecount}'>...{$_pagecount}</a>"); //入栈
                 }
             }
