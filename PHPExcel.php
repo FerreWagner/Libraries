@@ -53,7 +53,7 @@ class Index extends Controller
 //         $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 //         $objWriter->save($path.$name.'.xlsx');
         
-        
+     
         $filename = 'think_admin'.time().'.xls';
         $objPHPExcel = new \PHPExcel();
         for ($i=1; $i < 3; $i++) {
