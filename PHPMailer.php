@@ -36,7 +36,7 @@ public function mail()
         $mail->IsSMTP();
         
         $mail->SMTPAuth   = true;
-        
+       
         $mail->SMTPKeepAlive = true;
         
 //         $mail->SMTPSecure = "SSL";
