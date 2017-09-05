@@ -8,7 +8,7 @@
       
 2、TP5中的使用方法：composer require phpmailer/phpmailer
                   //使用composer在vendor中引入类库
-                  $mail = new \PHPMailer();
+                  $mail = new \PHPMailer(); 
                   //直接实例化使用，无需做use或require引用
 
 
